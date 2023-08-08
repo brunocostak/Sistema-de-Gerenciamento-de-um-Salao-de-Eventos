@@ -1,4 +1,18 @@
 {
+  "printWidth": 80,
   "singleQuote": true,
-  "trailingComma": "all"
+  "semi": true,
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "endOfLine": "auto",
+  "overrides": [
+    {
+      "files": "*.md",
+      "options": {
+        "parser": "markdown"
+      }
+    }
+  ]
 }
