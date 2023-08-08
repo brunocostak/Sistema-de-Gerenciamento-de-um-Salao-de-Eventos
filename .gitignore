@@ -1,0 +1,4 @@
+./database/data/*
+
+# allows to set a folder to keep, must be set last
+!.gitkeep
