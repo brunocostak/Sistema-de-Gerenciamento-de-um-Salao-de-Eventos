@@ -11,10 +11,63 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String
-  email    String @unique
-  password String
+  id          Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique
+  password    String
+  Event       Event[]
+  SoldTickets SoldTickets[]
 
   @@map("users")
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  date        DateTime
+  type        String // tipo do evento: musical(qualquer pessoa pode participar, mediante inscrição), exposições gratuitas (qualquer pessoa pode participar, sem necessidade de inscrição/convite) ou eventos fechados (somente pessoas autorizadas podem participar, mediante convite em forma de chave/senha de acesso)
+  closed      Boolean // true se for um evento fechado, false se for aberto
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id])
+  location    location? @relation(fields: [locationId], references: [id])
+  locationId  Int?
+  Ticket      Ticket[]
+
+  @@map("events")
+}
+
+model location {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  address     String
+  city        String
+  state       String
+  cep         String
+  Event       Event[]
+
+  @@map("locations")
+}
+
+model Ticket {
+  id          String        @id @default(uuid())
+  eventId     Int           @map("event_id")
+  event       Event         @relation(fields: [eventId], references: [id])
+  price       Decimal       @db.Money
+  type        String // tipo do ingresso: inteira, meia, vip, etc
+  amount      Int // quantidade de ingressos disponíveis
+  sold        Int // quantidade de ingressos vendidos
+  date        DateTime
+  SoldTickets SoldTickets[]
+}
+
+model SoldTickets {
+  id       String @id @default(uuid())
+  ticketId String @map("ticket_id")
+  ticket   Ticket @relation(fields: [ticketId], references: [id])
+  userId   Int    @map("user_id")
+  user     User   @relation(fields: [userId], references: [id])
+
+  @@map("sold_tickets")
 }
