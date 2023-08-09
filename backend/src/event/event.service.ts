@@ -13,7 +13,7 @@ export class EventService {
 
   async findAll(): Promise<Event[] | IErrorReturn> {
     const events = await this.prisma.event.findMany();
-    if (!events) {
+    if (!events || events.length === 0) {
       return {
         error: 'Not found',
         statusCode: 404,
@@ -57,9 +57,10 @@ export class EventService {
     id: number,
     data: EventCreateDto
   ): Promise<string | IErrorReturn> {
+    const idNumber = Number(id);
     const event = await this.prisma.event.update({
       where: {
-        id,
+        id: idNumber,
       },
       data: {
         name: data.name,
@@ -92,7 +93,7 @@ export class EventService {
   async delete(id: number): Promise<string | IErrorReturn> {
     const event = await this.prisma.event.delete({
       where: {
-        id: id,
+        id: Number(id),
       },
     });
     if (!event) {
@@ -109,23 +110,32 @@ export class EventService {
 
   async find(
     name: string,
-    date: Date,
+    date: string,
     locationId: number,
     userId: number,
-    type: string
+    type: string,
+    closed: string
   ): Promise<Event[] | IErrorReturn> {
     const whereClause: IEventFilter = {};
 
     if (name) whereClause.name = name;
     if (date) whereClause.date = date;
-    if (locationId) whereClause.locationId = locationId;
-    if (userId) whereClause.userId = userId;
+    if (locationId) whereClause.locationId = Number(locationId);
+    if (userId) whereClause.userId = Number(userId);
     if (type) whereClause.type = type;
+    if (closed) whereClause.closed = closed === 'true' ? true : false;
 
     const events = await this.prisma.event.findMany({
-      where: whereClause,
+      where: {
+        name: { contains: whereClause.name },
+        date: whereClause.date,
+        locationId: whereClause.locationId,
+        userId: whereClause.userId,
+        type: whereClause.type,
+        closed: whereClause.closed,
+      },
     });
-    if (!events) {
+    if (!events || events.length === 0) {
       return {
         error: 'Not found',
         statusCode: 404,

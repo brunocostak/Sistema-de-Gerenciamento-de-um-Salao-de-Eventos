@@ -11,7 +11,7 @@ export class LocationService {
   // CRUD Routes
   async findAll(): Promise<location[] | IErrorReturn> {
     const locations = await this.prisma.location.findMany();
-    if (!locations) {
+    if (!locations || locations.length === 0) {
       return {
         error: 'Not found',
         statusCode: 404,

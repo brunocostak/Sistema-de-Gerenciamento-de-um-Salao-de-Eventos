@@ -1,7 +1,8 @@
 export default interface IEventFilter {
   name?: string;
-  date?: Date;
+  date?: string;
   locationId?: number;
   userId?: number;
   type?: string;
+  closed?: boolean;
 }

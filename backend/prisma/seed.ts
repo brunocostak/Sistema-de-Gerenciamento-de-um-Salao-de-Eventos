@@ -32,7 +32,7 @@ const eventSeed = async () => {
       description: 'Description 1',
       type: 'musical',
       closed: false,
-      date: new Date(),
+      date: '09/08/2023',
       user: {
         connect: {
           id: 1,
@@ -51,7 +51,7 @@ const eventSeed = async () => {
       description: 'Description 2',
       type: 'gratuito',
       closed: false,
-      date: new Date(),
+      date: '09/08/2023',
       user: {
         connect: {
           id: 1,
@@ -70,7 +70,7 @@ const eventSeed = async () => {
       description: 'Description 3',
       type: 'fechado',
       closed: true,
-      date: new Date(),
+      date: '09/08/2023',
       user: {
         connect: {
           id: 1,

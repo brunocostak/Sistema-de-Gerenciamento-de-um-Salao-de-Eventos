@@ -25,7 +25,7 @@ model Event {
   id          Int       @id @default(autoincrement())
   name        String
   description String
-  date        DateTime
+  date        String
   type        String // tipo do evento: musical(qualquer pessoa pode participar, mediante inscrição), exposições gratuitas (qualquer pessoa pode participar, sem necessidade de inscrição/convite) ou eventos fechados (somente pessoas autorizadas podem participar, mediante convite em forma de chave/senha de acesso)
   closed      Boolean // true se for um evento fechado, false se for aberto
   userId      Int       @map("user_id")
