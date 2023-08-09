@@ -57,7 +57,6 @@ model Ticket {
   price       Decimal       @db.Money
   type        String // tipo do ingresso: inteira, meia, vip, etc
   amount      Int // quantidade de ingressos disponíveis
-  sold        Int // quantidade de ingressos vendidos
   date        DateTime
   SoldTickets SoldTickets[]
 }
