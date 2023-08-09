@@ -32,7 +32,7 @@ export class EventController {
   @Put('update/:id')
   async update(
     @Param('id') id: number,
-    data: EventCreateDto
+    @Body() data: EventCreateDto
   ): Promise<string | IErrorReturn> {
     const event = await this.eventService.update(id, data);
     return event;

@@ -58,6 +58,7 @@ export class EventService {
     data: EventCreateDto
   ): Promise<string | IErrorReturn> {
     const idNumber = Number(id);
+    console.log(data);
     const event = await this.prisma.event.update({
       where: {
         id: idNumber,
@@ -87,7 +88,7 @@ export class EventService {
         message: 'Event not updated',
       };
     }
-    return 'Event with id ${id} has been updated';
+    return `Event with id ${idNumber} has been updated`;
   }
 
   async delete(id: number): Promise<string | IErrorReturn> {
