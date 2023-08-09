@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { LocationService } from './location.service';
 import { LocationCreateDto } from './dtos/create-location.dto';
 
@@ -13,18 +21,18 @@ export class LocationController {
     return this.locationService.findAll();
   }
 
-  @Post()
+  @Post('create')
   async create(@Body() data: LocationCreateDto) {
     return this.locationService.create(data);
   }
 
   @Put('update/:id')
-  async update(@Param('id') id: number, @Body() data: LocationCreateDto) {
+  async update(@Param('id') id: string, @Body() data: LocationCreateDto) {
     return this.locationService.update(id, data);
   }
 
-  @Put('delete/:id')
-  async delete(@Param('id') id: number) {
+  @Delete('delete/:id')
+  async delete(@Param('id') id: string) {
     return this.locationService.delete(id);
   }
 }

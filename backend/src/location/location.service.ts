@@ -34,11 +34,12 @@ export class LocationService {
   }
 
   async update(
-    id: number,
+    id: string,
     data: LocationCreateDto
   ): Promise<string | IErrorReturn> {
+    const idNumber = Number(id);
     const location = await this.prisma.location.update({
-      where: { id },
+      where: { id: idNumber },
       data,
     });
     if (!location) {
@@ -51,8 +52,11 @@ export class LocationService {
     return `Location with id: ${id} updated`;
   }
 
-  async delete(id: number): Promise<string | IErrorReturn> {
-    const location = await this.prisma.location.delete({ where: { id } });
+  async delete(id: string): Promise<string | IErrorReturn> {
+    const idNumber = Number(id);
+    const location = await this.prisma.location.delete({
+      where: { id: idNumber },
+    });
     if (!location) {
       return {
         error: 'Not deleted',
