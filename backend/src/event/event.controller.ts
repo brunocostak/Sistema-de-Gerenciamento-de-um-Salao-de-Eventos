@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import { EventCreateDto } from './dtos/event-create.dto';
@@ -40,6 +41,24 @@ export class EventController {
   @Delete('delete/:id')
   async delete(@Param('id') id: number): Promise<string | IErrorReturn> {
     const event = await this.eventService.delete(id);
+    return event;
+  }
+
+  @Get('find')
+  async find(
+    @Query('name') name: string,
+    @Query('date') date: Date,
+    @Query('locationId') locationId: number,
+    @Query('userId') userId: number,
+    @Query('type') type: string
+  ): Promise<Event[] | IErrorReturn> {
+    const event = await this.eventService.find(
+      name,
+      date,
+      locationId,
+      userId,
+      type
+    );
     return event;
   }
 }
