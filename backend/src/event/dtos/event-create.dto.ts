@@ -31,7 +31,7 @@ export class EventCreateDto {
 
   @IsDate()
   @IsNotEmpty()
-  date: Date;
+  date: string;
 
   @IsBoolean()
   @IsNotEmpty()

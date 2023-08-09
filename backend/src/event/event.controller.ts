@@ -47,17 +47,19 @@ export class EventController {
   @Get('find')
   async find(
     @Query('name') name: string,
-    @Query('date') date: Date,
+    @Query('date') date: string,
     @Query('locationId') locationId: number,
     @Query('userId') userId: number,
-    @Query('type') type: string
+    @Query('type') type: string,
+    @Query('closed') closed: string
   ): Promise<Event[] | IErrorReturn> {
     const event = await this.eventService.find(
       name,
       date,
       locationId,
       userId,
-      type
+      type,
+      closed
     );
     return event;
   }
