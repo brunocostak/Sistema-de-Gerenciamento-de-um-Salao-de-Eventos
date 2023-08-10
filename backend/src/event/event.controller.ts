@@ -24,8 +24,10 @@ export class EventController {
   }
 
   @Post('create')
-  async create(@Body() data: EventCreateDto): Promise<Event | IErrorReturn> {
-    const event = await this.eventService.create(data);
+  async createEventsAndTickets(
+    @Body() data: EventCreateDto
+  ): Promise<Event | IErrorReturn> {
+    const event = await this.eventService.createEventWithTickets(data);
     return event;
   }
 

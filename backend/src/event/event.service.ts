@@ -53,6 +53,34 @@ export class EventService {
     return event;
   }
 
+  async createEventWithTickets(data: EventCreateDto) {
+    const { Ticket, ...eventData } = data;
+
+    const createdEvent = await this.prisma.event.create({
+      data: {
+        ...eventData,
+      },
+    });
+
+    Ticket.map(async (ticket) => {
+      console.log(ticket);
+      return await this.prisma.ticket.create({
+        data: {
+          type: ticket.type,
+          price: ticket.price,
+          amount: ticket.amount,
+          event: {
+            connect: {
+              id: createdEvent.id,
+            },
+          },
+        },
+      });
+    });
+
+    return createdEvent;
+  }
+
   async update(
     id: number,
     data: EventCreateDto

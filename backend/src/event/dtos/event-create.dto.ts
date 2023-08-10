@@ -8,6 +8,7 @@ import {
   MinLength,
   MaxLength,
 } from 'class-validator';
+import { TicketCreateDto } from './ticket-create.dto';
 
 export class EventCreateDto {
   @IsOptional()
@@ -44,4 +45,7 @@ export class EventCreateDto {
   @IsNumber()
   @IsNotEmpty()
   locationId: number;
+
+  @IsNotEmpty()
+  Ticket: TicketCreateDto[];
 }
