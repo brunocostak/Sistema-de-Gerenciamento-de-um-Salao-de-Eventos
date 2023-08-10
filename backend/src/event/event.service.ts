@@ -145,4 +145,22 @@ export class EventService {
     }
     return events;
   }
+
+  async paginate(
+    page: number,
+    perPage: number
+  ): Promise<Event[] | IErrorReturn> {
+    const events = await this.prisma.event.findMany({
+      skip: (page - 1) * perPage,
+      take: perPage,
+    });
+    if (!events || events.length === 0) {
+      return {
+        error: 'Not found',
+        statusCode: 404,
+        message: 'Events not found',
+      };
+    }
+    return events;
+  }
 }
