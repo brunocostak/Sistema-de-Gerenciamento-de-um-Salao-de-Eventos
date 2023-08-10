@@ -63,4 +63,14 @@ export class EventController {
     );
     return event;
   }
+
+  @Get('page')
+  async paginate(
+    @Query('page') page: string,
+    @Query('take') perPage: string
+  ): Promise<Event[] | IErrorReturn> {
+    const pageNumber = Number(page);
+    const perPageNumber = Number(perPage);
+    return this.eventService.paginate(pageNumber, perPageNumber);
+  }
 }
