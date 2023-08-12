@@ -4,6 +4,7 @@ import { EventCreateDto } from './dtos/event-create.dto';
 import IErrorReturn from 'src/interfaces/IErrorReturn';
 import { Event } from '@prisma/client';
 import IEventFilter from 'src/interfaces/IEventFilter';
+import { getTicketIdsByEventId } from 'src/utils/getHelpers';
 
 @Injectable()
 export class EventService {
@@ -12,7 +13,11 @@ export class EventService {
   // CRUD Routes
 
   async findAll(): Promise<Event[] | IErrorReturn> {
-    const events = await this.prisma.event.findMany();
+    const events = await this.prisma.event.findMany({
+      include: {
+        Ticket: true,
+      },
+    });
     if (!events || events.length === 0) {
       return {
         error: 'Not found',
@@ -21,36 +26,6 @@ export class EventService {
       };
     }
     return events;
-  }
-
-  async create(data: EventCreateDto): Promise<Event | IErrorReturn> {
-    const event = await this.prisma.event.create({
-      data: {
-        name: data.name,
-        description: data.description,
-        type: data.type,
-        closed: data.closed,
-        date: data.date,
-        user: {
-          connect: {
-            id: data.userId,
-          },
-        },
-        location: {
-          connect: {
-            id: data.locationId,
-          },
-        },
-      },
-    });
-    if (!event) {
-      return {
-        error: 'Not created',
-        statusCode: 400,
-        message: 'Event not created',
-      };
-    }
-    return event;
   }
 
   async createEventWithTickets(data: EventCreateDto) {
@@ -62,80 +37,120 @@ export class EventService {
       },
     });
 
-    Ticket.map(async (ticket) => {
-      console.log(ticket);
-      return await this.prisma.ticket.create({
-        data: {
-          type: ticket.type,
-          price: ticket.price,
-          amount: ticket.amount,
-          event: {
-            connect: {
-              id: createdEvent.id,
+    const createdTickets = await Promise.all(
+      (
+        Ticket || [
+          {
+            type: 'default',
+            price: 0,
+            amount: 0,
+          },
+        ]
+      ).map(async (ticket) => {
+        const createdTicket = await this.prisma.ticket.create({
+          data: {
+            type: ticket.type,
+            price: ticket.price,
+            amount: ticket.amount,
+            event: {
+              connect: {
+                id: createdEvent.id,
+              },
             },
           },
-        },
-      });
-    });
+        });
+        return createdTicket;
+      })
+    );
 
-    return createdEvent;
+    return {
+      ...createdEvent,
+      Ticket: createdTickets,
+    };
   }
 
-  async update(
-    id: number,
+  async updateEventWithTickets(
+    eventId: number,
     data: EventCreateDto
   ): Promise<string | IErrorReturn> {
-    const idNumber = Number(id);
-    console.log(data);
-    const event = await this.prisma.event.update({
+    const { Ticket, ...eventData } = data;
+    const idNumber = Number(eventId);
+
+    // Atualizar dados do evento
+    await this.prisma.event.update({
       where: {
         id: idNumber,
       },
       data: {
-        name: data.name,
-        description: data.description,
-        type: data.type,
-        closed: data.closed,
-        date: data.date,
+        name: eventData.name,
+        description: eventData.description,
+        type: eventData.type,
+        closed: eventData.closed,
+        date: eventData.date,
+        hour: eventData.hour,
+        eventPassword: eventData.eventPassword,
         user: {
           connect: {
-            id: data.userId,
+            id: eventData.userId,
           },
         },
         location: {
           connect: {
-            id: data.locationId,
+            id: eventData.locationId,
           },
         },
       },
     });
-    if (!event) {
-      return {
-        error: 'Not updated',
-        statusCode: 400,
-        message: 'Event not updated',
-      };
+
+    const findTicketsId = await getTicketIdsByEventId(idNumber);
+    console.log('findTicketsId', findTicketsId);
+
+    // Atualizar dados dos ingressos
+    if (Ticket && findTicketsId.length > 0) {
+      await Promise.all(
+        Ticket.map(async (ticket, index) => {
+          // console.log('wtf', findTicketsId[index]);
+          await this.prisma.ticket.update({
+            where: {
+              id: String(findTicketsId[index]), // Use o ID do ingresso para atualização
+            },
+            data: {
+              type: ticket.type,
+              price: ticket.price,
+              amount: ticket.amount,
+            },
+          });
+        })
+      );
     }
-    return `Event with id ${idNumber} has been updated`;
+
+    return `Event with id ${eventId} has been updated`;
   }
 
-  async delete(id: number): Promise<string | IErrorReturn> {
-    const event = await this.prisma.event.delete({
+  async deleteEventWithTickets(eventId: number) {
+    // Primeiro, encontre os IDs dos ingressos associados ao evento
+    const ticketIds = await getTicketIdsByEventId(eventId);
+
+    // Delete os ingressos associados ao evento
+    await this.prisma.ticket.deleteMany({
       where: {
-        id: Number(id),
+        id: {
+          in: ticketIds,
+        },
       },
     });
-    if (!event) {
-      return {
-        error: 'Not deleted',
-        statusCode: 400,
-        message: 'Event not deleted',
-      };
-    }
-    return `Event with id ${id} has been deleted`;
+
+    // Delete o evento
+    await this.prisma.event.delete({
+      where: {
+        id: eventId,
+      },
+    });
+
+    return `Event with id ${eventId} and its associated tickets have been deleted`;
   }
 
-  // Filter Routes
+  // Filter Routesa
 
   async find(
     name: string,

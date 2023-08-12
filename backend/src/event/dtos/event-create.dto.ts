@@ -38,6 +38,13 @@ export class EventCreateDto {
   @IsNotEmpty()
   closed: boolean;
 
+  @IsString()
+  hour: string;
+
+  @IsOptional()
+  @IsString()
+  eventPassword: string;
+
   @IsNumber()
   @IsNotEmpty()
   userId: number;
@@ -46,6 +53,6 @@ export class EventCreateDto {
   @IsNotEmpty()
   locationId: number;
 
-  @IsNotEmpty()
-  Ticket: TicketCreateDto[];
+  @IsOptional()
+  Ticket?: TicketCreateDto[];
 }

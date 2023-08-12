@@ -15,6 +15,7 @@ model User {
   name        String
   email       String        @unique
   password    String
+  role        String        @default("user")
   Event       Event[]
   SoldTickets SoldTickets[]
 
@@ -22,17 +23,19 @@ model User {
 }
 
 model Event {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String
-  date        String
-  type        String // tipo do evento: musical(qualquer pessoa pode participar, mediante inscrição), exposições gratuitas (qualquer pessoa pode participar, sem necessidade de inscrição/convite) ou eventos fechados (somente pessoas autorizadas podem participar, mediante convite em forma de chave/senha de acesso)
-  closed      Boolean // true se for um evento fechado, false se for aberto
-  userId      Int       @map("user_id")
-  user        User      @relation(fields: [userId], references: [id])
-  location    location? @relation(fields: [locationId], references: [id])
-  locationId  Int?
-  Ticket      Ticket[]
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String
+  date          String
+  hour          String?
+  type          String // tipo do evento: musical(qualquer pessoa pode participar, mediante inscrição), exposições gratuitas (qualquer pessoa pode participar, sem necessidade de inscrição/convite) ou eventos fechados (somente pessoas autorizadas podem participar, mediante convite em forma de chave/senha de acesso)
+  closed        Boolean // true se for um evento fechado, false se for aberto
+  eventPassword String?   @map("event_password") // senha de acesso ao evento, caso seja fechado
+  userId        Int       @map("user_id")
+  user          User      @relation(fields: [userId], references: [id])
+  location      location? @relation(fields: [locationId], references: [id])
+  locationId    Int?
+  Ticket        Ticket[]
 
   @@map("events")
 }
